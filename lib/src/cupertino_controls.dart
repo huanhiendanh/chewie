@@ -80,7 +80,9 @@ class _CupertinoControlsState extends State<CupertinoControls> {
               _buildTopBar(
                   backgroundColor, iconColor, barHeight, buttonPadding),
               _buildHitArea(),
-              _buildBottomBar(backgroundColor, iconColor, barHeight),
+              chewieController.showControlsBar
+                  ? _buildBottomBar(backgroundColor, iconColor, barHeight)
+                  : Container(),
             ],
           ),
         ),
@@ -443,6 +445,9 @@ class _CupertinoControlsState extends State<CupertinoControls> {
       _hideStuff = true;
 
       chewieController.toggleFullScreen();
+      if (chewieController.isPlaying) {
+        chewieController.togglePause();
+      }
       _expandCollapseTimer = Timer(Duration(milliseconds: 300), () {
         setState(() {
           _cancelAndRestartTimer();
@@ -496,15 +501,12 @@ class _CupertinoControlsState extends State<CupertinoControls> {
   }
 
   void _playPause() {
-      bool isFinished;
-      if( _latestValue.duration != null)
-      {
-        isFinished = _latestValue.position >= _latestValue.duration;
-      }
-      else
-      {
-        isFinished = false;
-      }
+    bool isFinished;
+    if (_latestValue.duration != null) {
+      isFinished = _latestValue.position >= _latestValue.duration;
+    } else {
+      isFinished = false;
+    }
 
     setState(() {
       if (controller.value.isPlaying) {
@@ -517,12 +519,18 @@ class _CupertinoControlsState extends State<CupertinoControls> {
         if (!controller.value.initialized) {
           controller.initialize().then((_) {
             controller.play();
+            if (!chewieController.isFullScreen) {
+              chewieController.enterFullScreen();
+            }
           });
         } else {
           if (isFinished) {
             controller.seekTo(Duration(seconds: 0));
           }
           controller.play();
+          if (!chewieController.isFullScreen) {
+            chewieController.enterFullScreen();
+          }
         }
       }
     });

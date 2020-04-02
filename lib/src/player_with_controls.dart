@@ -14,16 +14,7 @@ class PlayerWithControls extends StatelessWidget {
   Widget build(BuildContext context) {
     final ChewieController chewieController = ChewieController.of(context);
 
-    return Center(
-      child: Container(
-        width: MediaQuery.of(context).size.width,
-        child: AspectRatio(
-          aspectRatio:
-              chewieController.aspectRatio ?? _calculateAspectRatio(context),
-          child: _buildPlayerWithControls(chewieController, context),
-        ),
-      ),
-    );
+    return _buildPlayerWithControls(chewieController, context);
   }
 
   Container _buildPlayerWithControls(
@@ -32,13 +23,7 @@ class PlayerWithControls extends StatelessWidget {
       child: Stack(
         children: <Widget>[
           chewieController.placeholder ?? Container(),
-          Center(
-            child: AspectRatio(
-              aspectRatio: chewieController.aspectRatio ??
-                  _calculateAspectRatio(context),
-              child: VideoPlayer(chewieController.videoPlayerController),
-            ),
-          ),
+          VideoPlayer(chewieController.videoPlayerController),
           chewieController.overlay ?? Container(),
           _buildControls(context, chewieController),
         ],

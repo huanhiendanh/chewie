@@ -69,7 +69,9 @@ class _MaterialControlsState extends State<MaterialControls> {
                       ),
                     )
                   : _buildHitArea(),
-              _buildBottomBar(context),
+              chewieController.showControlsBar
+                  ? _buildBottomBar(context)
+                  : Container(),
             ],
           ),
         ),
@@ -191,11 +193,11 @@ class _MaterialControlsState extends State<MaterialControls> {
                 child: Container(
                   decoration: BoxDecoration(
                     color: Theme.of(context).dialogBackgroundColor,
-                    borderRadius: BorderRadius.circular(48.0),
+                    borderRadius: BorderRadius.circular(24.0),
                   ),
                   child: Padding(
                     padding: EdgeInsets.all(12.0),
-                    child: Icon(Icons.play_arrow, size: 32.0),
+                    child: Icon(Icons.play_arrow, size: 20.0),
                   ),
                 ),
               ),
@@ -314,6 +316,9 @@ class _MaterialControlsState extends State<MaterialControls> {
       _hideStuff = true;
 
       chewieController.toggleFullScreen();
+      if (chewieController.isPlaying) {
+        chewieController.togglePause();
+      }
       _showAfterExpandCollapseTimer = Timer(Duration(milliseconds: 300), () {
         setState(() {
           _cancelAndRestartTimer();
@@ -324,12 +329,9 @@ class _MaterialControlsState extends State<MaterialControls> {
 
   void _playPause() {
     bool isFinished;
-    if( _latestValue.duration != null)
-    {
+    if (_latestValue.duration != null) {
       isFinished = _latestValue.position >= _latestValue.duration;
-    }
-    else
-    {
+    } else {
       isFinished = false;
     }
 
@@ -344,12 +346,18 @@ class _MaterialControlsState extends State<MaterialControls> {
         if (!controller.value.initialized) {
           controller.initialize().then((_) {
             controller.play();
+            if (!chewieController.isFullScreen) {
+              chewieController.enterFullScreen();
+            }
           });
         } else {
           if (isFinished) {
             controller.seekTo(Duration(seconds: 0));
           }
           controller.play();
+          if (!chewieController.isFullScreen) {
+            chewieController.enterFullScreen();
+          }
         }
       }
     });

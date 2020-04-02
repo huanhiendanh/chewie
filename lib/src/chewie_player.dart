@@ -216,7 +216,9 @@ class ChewieController extends ChangeNotifier {
   final bool showControlsOnInitialize;
 
   /// Whether or not to show the controls at all
-  final bool showControls;
+  bool showControls;
+
+  bool showControlsBar = false;
 
   /// Defines customised controls. Check [MaterialControls] or
   /// [CupertinoControls] for reference.
@@ -319,11 +321,13 @@ class ChewieController extends ChangeNotifier {
 
   void enterFullScreen() {
     _isFullScreen = true;
+    showControlsBar = true;
     notifyListeners();
   }
 
   void exitFullScreen() {
     _isFullScreen = false;
+    showControlsBar = false;
     notifyListeners();
   }
 
