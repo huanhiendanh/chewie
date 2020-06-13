@@ -34,6 +34,8 @@ class _CupertinoControlsState extends State<CupertinoControls> {
   final marginSize = 5.0;
   Timer _expandCollapseTimer;
   Timer _initTimer;
+  bool _dragging = false;
+  bool _displayTapped = false;
 
   VideoPlayerController controller;
   ChewieController chewieController;
@@ -215,17 +217,45 @@ class _CupertinoControlsState extends State<CupertinoControls> {
   Expanded _buildHitArea() {
     return Expanded(
       child: GestureDetector(
-        onTap: _latestValue != null && _latestValue.isPlaying
-            ? _cancelAndRestartTimer
-            : () {
-                _hideTimer?.cancel();
+        onTap: () {
+          if (_latestValue != null && _latestValue.isPlaying) {
+            if (_displayTapped) {
+              setState(() {
+                _hideStuff = true;
+              });
+            } else
+              _cancelAndRestartTimer();
+          } else {
+            _playPause();
 
-                setState(() {
-                  _hideStuff = false;
-                });
-              },
+            setState(() {
+              _hideStuff = true;
+            });
+          }
+        },
         child: Container(
           color: Colors.transparent,
+          child: Center(
+            child: AnimatedOpacity(
+              opacity:
+                  _latestValue != null && !_latestValue.isPlaying && !_dragging
+                      ? 1.0
+                      : 0.0,
+              duration: Duration(milliseconds: 300),
+              child: GestureDetector(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).dialogBackgroundColor,
+                    borderRadius: BorderRadius.circular(24.0),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(12.0),
+                    child: Icon(Icons.play_arrow, size: 20.0),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -413,11 +443,12 @@ class _CupertinoControlsState extends State<CupertinoControls> {
 
   void _cancelAndRestartTimer() {
     _hideTimer?.cancel();
+    _startHideTimer();
 
     setState(() {
       _hideStuff = false;
+      _displayTapped = true;
 
-      _startHideTimer();
     });
   }
 
@@ -463,9 +494,17 @@ class _CupertinoControlsState extends State<CupertinoControls> {
         child: CupertinoVideoProgressBar(
           controller,
           onDragStart: () {
+            setState(() {
+              _dragging = true;
+            });
+
             _hideTimer?.cancel();
           },
           onDragEnd: () {
+            setState(() {
+              _dragging = false;
+            });
+            
             _startHideTimer();
           },
           colors: chewieController.cupertinoProgressColors ??
