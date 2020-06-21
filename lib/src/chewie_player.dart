@@ -125,7 +125,8 @@ class ChewieState extends State<Chewie> {
     final TransitionRoute<Null> route = PageRouteBuilder<Null>(
       pageBuilder: _fullScreenRoutePageBuilder,
     );
-
+    Orientation orientation = MediaQuery.of(context).orientation;
+  
     SystemChrome.setEnabledSystemUIOverlays([]);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
@@ -138,7 +139,7 @@ class ChewieState extends State<Chewie> {
 
     await Navigator.of(context, rootNavigator: true).push(route);
     _isFullScreen = false;
-    widget.controller.exitFullScreen();
+    widget.controller.exitFullScreen(orientation);
 
     // The wakelock plugins checks whether it needs to perform an action internally,
     // so we do not need to check Wakelock.isEnabled.
@@ -324,7 +325,18 @@ class ChewieController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void exitFullScreen() {
+  void exitFullScreen(Orientation orientation) {
+    if (orientation == Orientation.portrait) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp
+      ]);
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeRight,
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
+    }
     _isFullScreen = false;
     showControlsBar = false;
     // SystemChrome.setPreferredOrientations([
