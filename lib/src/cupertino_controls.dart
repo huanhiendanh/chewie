@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
-
+import 'package:flutter/services.dart';
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/cupertino_progress_bar.dart';
@@ -472,12 +472,12 @@ class _CupertinoControlsState extends State<CupertinoControls> {
   }
 
   void _onExpandCollapse() {
+    
     setState(() {
       _hideStuff = true;
-
       chewieController.toggleFullScreen();
       if (chewieController.isPlaying) {
-        chewieController.togglePause();
+        chewieController.togglePause();  
       }
       _expandCollapseTimer = Timer(Duration(milliseconds: 300), () {
         setState(() {
